@@ -1,4 +1,6 @@
 # Chess
+## Viikkoraportit
+- [Viikko 1]()
 
 ## Documentation
 - [Määrittelydokumentti](https://github.com/sebastian-lehto/tiral-chess/blob/master/documentation/m%C3%A4%C3%A4rittelydokumentti.md)
