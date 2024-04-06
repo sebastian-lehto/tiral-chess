@@ -6,14 +6,14 @@ import chess.engine.GameState;
 
 public class AntonBoard {
     String[][] board = {
-        {"bR","bN","bQ","--","bK","bB","bN","bR"},
-        {"bP","--","bP","bP","bP","bP","bP","bP"},
-        {"bB","bP","--","--","--","--","--","--"},
+        {"bR","bN","bB","bQ","bK","bB","bN","bR"},
+        {"bP","bP","bP","bP","bP","bP","bP","bP"},
         {"--","--","--","--","--","--","--","--"},
-        {"--","--","--","wP","--","wB","--","--"},
-        {"--","--","--","--","wP","wN","--","--"},
-        {"wP","wP","wP","--","--","wP","wP","wP"},
-        {"wR","wN","--","wQ","wK","wB","--","wR"}
+        {"--","--","--","--","--","--","--","--"},
+        {"--","--","--","--","--","--","--","--"},
+        {"--","--","--","--","--","--","--","--"},
+        {"wP","wP","wP","wP","wP","wP","wP","wP"},
+        {"wR","wN","wB","wQ","wK","wB","wN","wR"}
     };
     ArrayList<int[]> pins = new ArrayList<>();
     ArrayList<int[]> checks = new ArrayList<>();
