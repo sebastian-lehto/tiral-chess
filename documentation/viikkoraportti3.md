@@ -1,6 +1,6 @@
 # Viikko 3
 
 - Sain siirtojen generoimisen valmiiksi
-- alpha-beta-karsinnalla tehostettu minimax-funktio on melkein valmis
+- alpha-beta-karsinnalla tehostettu minimax-funktio on myös valmis
 
-- Seuraavaksi viimeistelen minimax-funktion ja aloitan testauksen
+- Seuraavaksi viimeistelen heurestiikkafunktion arvioimaan muutakin kuin materiaalin määrää ja aloitan testauksen
