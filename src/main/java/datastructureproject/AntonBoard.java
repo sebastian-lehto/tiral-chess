@@ -15,12 +15,12 @@ public class AntonBoard {
         {"wP","wP","wP","wP","wP","wP","wP","wP"},
         {"wR","wN","wB","wQ","wK","wB","wN","wR"}
     };
-    ArrayList<int[]> pins = new ArrayList<>();
-    ArrayList<int[]> checks = new ArrayList<>();
+
     int[] whiteKingSquare = {7, 4};
     int[] blackKingSquare = {0, 4};
     Boolean[] whiteCastleRights = {true, true};
     Boolean[] blackCastleRights = {true, true};
+    ArrayList<Move> moveLog = new ArrayList<Move>();
     
 
     public ArrayList<String> getMovesForSquare(int row, int col, Character side) {
@@ -51,21 +51,16 @@ public class AntonBoard {
             if ( targetColor(row+step, col+1) == opponent) {
                 moves.add(square+getRank(col+1)+(8-row-step));
             }
-        
         }
 
-        if (piece == 'R') {
-            int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        if (piece == 'N') {
+            int[][] dirs = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2},};
             for (int[] dir : dirs) {
-                for (int i = 1; i < 8; i++) {
-                    int newCol = col + (dir[0] * i);
-                    int newRow = row + (dir[1] * i);
+                int newCol = col + (dir[0]);
+                int newRow = row + (dir[1]);
 
-                    if (blockers.indexOf(targetColor(newRow, newCol)) != -1) {
-                        break;
-                    }
+                if (targetColor(newRow, newCol) == opponent) {
                     moves.add(square+getRank(newCol)+(8-newRow));
-                    if (targetColor(newRow, newCol) == opponent) break;
                 }
             }
         }
@@ -86,14 +81,18 @@ public class AntonBoard {
             }
         }
 
-        if (piece == 'N') {
-            int[][] dirs = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2},};
+        if (piece == 'R') {
+            int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
             for (int[] dir : dirs) {
-                int newCol = col + (dir[0]);
-                int newRow = row + (dir[1]);
+                for (int i = 1; i < 8; i++) {
+                    int newCol = col + (dir[0] * i);
+                    int newRow = row + (dir[1] * i);
 
-                if (targetColor(newRow, newCol) == opponent) {
+                    if (blockers.indexOf(targetColor(newRow, newCol)) != -1) {
+                        break;
+                    }
                     moves.add(square+getRank(newCol)+(8-newRow));
+                    if (targetColor(newRow, newCol) == opponent) break;
                 }
             }
         }
@@ -129,93 +128,82 @@ public class AntonBoard {
         return moves;
     }
 
-    public void doMove(String move) {
-        String start = move.substring(0, 2);
-        String end = move.substring(2, 4);
-        int scol = getRankNumber(start.charAt(0));
-        int srow = 8 - Integer.valueOf(start.substring(1, 2));
-        int ecol = getRankNumber(end.charAt(0));
-        int erow = 8 - Integer.valueOf(end.substring(1, 2));
-        String mover = this.board[srow][scol];
-        this.board[srow][scol] = "--";
-        this.board[erow][ecol] = mover;
-        if (mover.charAt(1) == 'P' && (erow == 0 || erow == 7)) {
-            String queen = mover.replace("P", "Q");
-            this.board[erow][ecol] = queen;
-        }
-        if (mover.charAt(1) == 'K') {
-            if (mover.charAt(0) == 'w') {
-                this.whiteKingSquare[0] = erow;
-                this.whiteKingSquare[1] = ecol;
-            } else {
-                this.blackKingSquare[0] = erow;
-                this.blackKingSquare[1] = ecol;
-            }
-        }
-    }
+    public void makeMove(String notation) {
+        Move move = new Move(notation, this.board);
+        
 
-    private boolean validate(String move, Character side) {
-        String start = move.substring(0, 2);
-        String end = move.substring(2, 4);
-        int scol = getRankNumber(start.charAt(0));
-        int srow = 8 - Integer.valueOf(start.substring(1, 2));
-        int ecol = getRankNumber(end.charAt(0));
-        int erow = 8 - Integer.valueOf(end.substring(1, 2));
-        String mover = this.board[srow][scol];
-        String target = this.board[erow][ecol];
-        this.board[srow][scol] = "--";
-        this.board[erow][ecol] = mover;
-        if (mover.charAt(1) == 'K') {
-            if (mover.charAt(0) == 'w') {
-                this.whiteKingSquare[0] = erow;
-                this.whiteKingSquare[1] = ecol;
+        this.board[move.srow][move.scol] = "--";
+        this.board[move.erow][move.ecol] = move.mover;
+        if (move.mover.charAt(1) == 'P' && (move.erow == 0 || move.erow == 7)) {
+            String queen = move.mover.replace("P", "Q");
+            this.board[move.erow][move.ecol] = queen;
+        }
+        if (move.mover.charAt(1) == 'K') {
+            if (move.mover.charAt(0) == 'w') {
+                this.whiteKingSquare[0] = move.erow;
+                this.whiteKingSquare[1] = move.ecol;
             } else {
-                this.blackKingSquare[0] = erow;
-                this.blackKingSquare[1] = ecol;
+                this.blackKingSquare[0] = move.erow;
+                this.blackKingSquare[1] = move.ecol;
             }
         }
-        updateChecksAndPins(side);
-        boolean valid = this.checks.size() == 0;
-    
-        this.board[srow][scol] = mover;
-        this.board[erow][ecol] = target;
-        if (mover.charAt(1) == 'K') {
-            if (mover.charAt(0) == 'w') {
-                this.whiteKingSquare[0] = srow;
-                this.whiteKingSquare[1] = scol;
+        this.moveLog.add(move);
+    }
+    public void undoMove() {
+        if (moveLog.isEmpty()) return;
+
+        Move latestMove = this.moveLog.get(this.moveLog.size() - 1);
+        this.board[latestMove.srow][latestMove.scol] = latestMove.mover;
+        this.board[latestMove.erow][latestMove.ecol] = latestMove.target;
+        if (latestMove.mover.charAt(1) == 'K') {
+            if (latestMove.mover.charAt(0) == 'w') {
+                this.whiteKingSquare[0] = latestMove.srow;
+                this.whiteKingSquare[1] = latestMove.scol;
             } else {
-                this.blackKingSquare[0] = srow;
-                this.blackKingSquare[1] = scol;
+                this.blackKingSquare[0] = latestMove.srow;
+                this.blackKingSquare[1] = latestMove.scol;
             }
         }
-        updateChecksAndPins(side);
+        this.moveLog.remove(this.moveLog.size() - 1);
+    }
+    private boolean validate(String move, Character side) {  
+        
+        makeMove(move);
+        
+        int row = (side == 'b') ? blackKingSquare[0] : whiteKingSquare[0];
+        int col = (side == 'b') ? blackKingSquare[1] : whiteKingSquare[1];
+        int kingDanger = evaluateSquare(side, row, col);
+        
+        boolean valid = kingDanger == 0;
+
+        undoMove();
         return valid;
-
     }
 
-    public int evaluate() {
+    public int evaluation() {
         int eval = 0;
         for (int i = 0; i < 8; i ++) {
             for (int j = 0; j < 8; j++) {
-                 Character colour = this.board[i][j].charAt(0);
+                 Character color = this.board[i][j].charAt(0);
+                 if (color == '-') continue;
                  Character piece = this.board[i][j].charAt(1);
                  int value = 0;
 
                  switch (piece) {
                     case 'P':
-                        value = 1;
+                        value = 10;
                         break;
                     case 'B':
-                        value = 3;
+                        value = 30 - evaluateSquare(color, i, j);
                         break;
                     case 'N':
-                        value = 3;
+                        value = 30 - evaluateSquare(color, i, j);
                         break;
                     case 'R':
-                        value = 5;
+                        value = 50 - evaluateSquare(color, i, j);
                         break;
                     case 'Q':
-                        value = 9;
+                        value = 90 - evaluateSquare(color, i, j);
                         break;
                     case 'K':
                         value = 10000;
@@ -225,7 +213,7 @@ public class AntonBoard {
                         break;
                  }
 
-                 if (colour == 'b') value *= -1;
+                 if (color == 'b') value *= -1;
                  eval += value;
             }
         }
@@ -234,9 +222,10 @@ public class AntonBoard {
 
     public ArrayList<String> getMoves(Character side) {
         ArrayList<String> moves = new ArrayList<String>();
+
         for (int i = 0; i < 8; i ++) {
             for (int j = 0; j < 8; j++) {
-                 moves.addAll(getMovesForSquare(i, j, side));
+                moves.addAll(getMovesForSquare(i, j, side));
             }
         }
         moves.removeIf(x -> !validate(x, side));
@@ -249,58 +238,37 @@ public class AntonBoard {
     private boolean onBoard(int col, int row) {
         return (col > -1 && col < 8 && row > -1 && row < 8);
     }
-    private void updateChecksAndPins(Character side) {
-        this.pins = new ArrayList<>();
-        this.checks = new ArrayList<>();
-        Character color = 'b';
-        Character opponent = 'w';
-        int row = blackKingSquare[0];
-        int col = blackKingSquare[1];
+    private int evaluateSquare(Character side, int row, int col) {
+        int checks = 0;
+        Character opponent = (side == 'b') ? 'w' : 'b';
+        int step = (side == 'b') ? 1 : -1;
 
-        if (side == 'w') {
-            color = 'w';
-            opponent = 'b';
-            row = whiteKingSquare[0];
-            col = whiteKingSquare[1];
-        }
-
-        int step = (color == 'b') ? 1 : -1;
         if (onBoard(row+step, col-1) && this.board[row+step][col-1] == (""+opponent+"P")) {
-            int[] check = {row+step, col-1};
-            this.checks.add(check);
+            checks++;
         }
         if (onBoard(row+step, col+1) && this.board[row+step][col+1] == (""+opponent+"P")) {
-            int[] check = {row+step, col+1};
-            this.checks.add(check);
+            checks++;
         }
         int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
             for (int[] dir : dirs) {
                 int blocking = 0;
-                int[] pin = {-1, -1};
                 for (int i = 1; i < 8; i++) {
-                    int newCol = col + (dir[0] * i);
-                    int newRow = row + (dir[1] * i);
-                    if (!onBoard(newCol, newRow)) break;
-                    Character targetPiece = this.board[newRow][newCol].charAt(1);
-                    Character targetColor = this.board[newRow][newCol].charAt(0);
-                    if (targetColor == color) {
+                    int targetCol = col + (dir[0] * i);
+                    int targetRow = row + (dir[1] * i);
+                    if (!onBoard(targetCol, targetRow)) break;
+                    Character targetPiece = this.board[targetRow][targetCol].charAt(1);
+                    Character targetColor = this.board[targetRow][targetCol].charAt(0);
+                    if (targetColor == side) {
                         blocking++;
                         if (blocking >= 2) break;
-                        pin[0] = newRow;
-                        pin[1] = newCol;
                     }
                     if (targetColor == opponent) {
                         int direction = Math.abs(dir[0] + dir[1]);
-                        if ((targetPiece == 'R' && direction != 1) || (targetPiece == 'B' && direction == 1) || targetPiece == 'N' || targetPiece == 'P') {
-                            break;
-                        }
-                        if ((targetPiece == 'R' && direction == 1) || (targetPiece == 'B' && direction != 1) || targetPiece == 'Q') {
+                        if (targetPiece == 'N' || targetPiece == 'P') break;
+                        if ((targetPiece == 'R' && direction != 1) || (targetPiece == 'B' && direction == 1)) break;
+                        if ((targetPiece == 'R') || (targetPiece == 'B') || targetPiece == 'Q') {
                             if (blocking == 0) {
-                                int[] check = {newRow, newCol};
-                                this.checks.add(check);
-                                break;
-                            } else {
-                                this.pins.add(pin);
+                                checks++;
                                 break;
                             }
                         }
@@ -309,18 +277,16 @@ public class AntonBoard {
             }
         int[][] ndirs = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
         for (int[] dir : ndirs) {
-            int newCol = col + (dir[1]);
-            int newRow = row + (dir[0]);
-            if (!onBoard(newCol, newRow)) continue;
-            Character targetPiece = this.board[newRow][newCol].charAt(1);
-            Character targetColor = this.board[newRow][newCol].charAt(0);
-            if (onBoard(newCol, newRow) && targetColor == opponent && targetPiece == 'N') {
-                int[] check = {newRow, newCol};
-                this.checks.add(check);
-                break;
+            int targetCol = col + (dir[1]);
+            int targetRow = row + (dir[0]);
+            if (!onBoard(targetCol, targetRow)) continue;
+            Character targetPiece = this.board[targetRow][targetCol].charAt(1);
+            Character targetColor = this.board[targetRow][targetCol].charAt(0);
+            if (targetColor == opponent && targetPiece == 'N') {
+                checks++;
             }
         }
-
+        return checks;
     }
     public void printBoard() {
         for (String[] line : this.board) {
@@ -355,27 +321,5 @@ public class AntonBoard {
         }
     }
 
-    private int getRankNumber(Character col) {
-        switch (col) {
-            case 'a':
-                return 0;
-            case 'b':
-                return 1;
-            case 'c':
-                return 2;
-            case 'd':
-                return 3;
-            case 'e':
-                return 4;
-            case 'f':
-                return 5;
-            case 'g':
-                return 6;
-            case 'h':
-                return 7;
-        
-            default:
-                return -1;
-        }
-    }
+    
 }

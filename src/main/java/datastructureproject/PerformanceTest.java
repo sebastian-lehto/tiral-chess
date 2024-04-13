@@ -25,17 +25,14 @@ public class PerformanceTest {
         AntonBot bot = new AntonBot();
         GameState gs = new GameState();
         Scanner s  = new Scanner(System.in);
-        int count = 0;
-        while (count < 50) {
-            bot.print(gs);
+        while (!bot.gameOver) {
+            bot.print();
             gs.moves.add(s.nextLine());
             String move = bot.nextMove(gs);
             gs.moves.add(move);
             System.out.println(move);
-            
-            
-            count++;
         }
+        s.close();
     }
 
 }
