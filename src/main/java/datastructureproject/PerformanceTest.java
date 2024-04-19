@@ -31,6 +31,11 @@ public class PerformanceTest {
             String move = bot.nextMove(gs);
             gs.moves.add(move);
             System.out.println(move);
+            if (bot.gameOver) {
+                System.out.println("CHECKMATE");
+                bot.print();
+                break;
+            }
         }
         s.close();
     }

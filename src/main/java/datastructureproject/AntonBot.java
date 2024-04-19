@@ -34,6 +34,7 @@ public class AntonBot implements ChessBot {
         int eval = minimax(gs, this.depth, -100000, 100000, true);
         this.board.makeMove(this.move);
         if (this.move == "a1a1") this.gameOver = true;
+        if (this.board.getMoves(opponent).isEmpty()) this.gameOver = true; 
         return this.move;
     }
 
