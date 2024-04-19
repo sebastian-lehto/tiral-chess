@@ -16,7 +16,7 @@ public class AntonBot implements ChessBot {
         this.depth = 5;
         this.side = 'b';
         this.opponent = 'w';
-        this.move = "NO BEST MOVE YET";
+        this.move = "TBD";
         gameOver = false;
     }
     public void print() {
