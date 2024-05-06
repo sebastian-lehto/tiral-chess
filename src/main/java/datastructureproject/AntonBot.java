@@ -1,82 +1,104 @@
 package datastructureproject;
 
+import java.util.ArrayList;
+
 import chess.bot.ChessBot;
 import chess.engine.GameState;
 
 public class AntonBot implements ChessBot { 
-    private AntonBoard board;
-    private int depth;
-    private Character side;
-    private Character opponent;
-    private String move;
+    public AntonBoard board;
+    public int depth;
+    public Character side;
+    public Character opponent;
+    public String move;
     public boolean gameOver;
     
     public AntonBot() {
+
         this.board = new AntonBoard();
         this.depth = 5;
         this.side = 'b';
         this.opponent = 'w';
-        this.move = "TBD";
+        this.move = "";
         gameOver = false;
+
     }
+
     public void print() {
         this.board.printBoard();
     }
+
     @Override
     public String nextMove(GameState gs) {
+
         if (gs.getMoveCount() == 0) {
             this.side = 'w';
             this.opponent = 'b';
         } else {
             this.board.makeMove(gs.getLatestMove());
         }
+
         this.move = "a1a1";
-        int eval = minimax(gs, this.depth, -100000, 100000, true);
+        ArrayList<String> moves = this.board.getMoves(side);
+        int eval = minimax(this.depth, -100000, 100000, true, moves);
         this.board.makeMove(this.move);
-        if (this.move == "a1a1") this.gameOver = true;
-        if (this.board.getMoves(opponent).isEmpty()) this.gameOver = true; 
+
+        if (eval == 10005 || eval == -10005) this.gameOver = true;
         return this.move;
     }
 
-    public int minimax(GameState gs, int currentDepth, int alpha, int beta, boolean maxing) {
-        
-        if (currentDepth == 0 || this.board.getMoves(side).isEmpty()) {
+    public int minimax(int currentDepth, int alpha, int beta, boolean maxing, ArrayList<String> moves) {
+
+        if (currentDepth == 0) {
             if (side == 'b') return this.board.evaluation() * -1;
             return this.board.evaluation();
         }
-        String bestMove = "";
         
         if (maxing) {
             int maxEval = -100000;
-            for (String move : this.board.getMoves(this.side)) {
-                gs.moves.add(move);
+            
+            for (String move : moves) {
+                
                 board.makeMove(move);
+                ArrayList<String> newMoves = this.board.getMoves(opponent);
 
-                int eval = minimax(gs, currentDepth-1, alpha, beta, false);
-                gs.moves.remove(gs.moves.size() - 1);
+                if (newMoves.isEmpty()) {
+                    if (currentDepth == this.depth) {
+                        this.move = move;
+                    }
+                    board.undoMove();
+                    return 10000 + currentDepth;
+                }
+                
+                int eval = minimax(currentDepth-1, alpha, beta, false, newMoves);
+                
                 board.undoMove();
+                
                 if (eval > maxEval) {
                     if (currentDepth == this.depth) {
-                        bestMove = move; 
-                        this.move = bestMove;
+                        this.move = move;
                     }
-                    maxEval = eval;
-                    
-                    
+                    maxEval = eval; 
                 } 
                 alpha = Math.max(alpha, eval);
                 if (beta <= alpha) break;
             }
             
             return maxEval;
+
         } else {
             int minEval = 100000;
             for (String move : this.board.getMoves(this.opponent)) {
-                gs.moves.add(move);
                 board.makeMove(move);
-
-                int eval = minimax(gs, currentDepth-1, alpha, beta, true);
-                gs.moves.remove(gs.moves.size() - 1);
+                ArrayList<String> newMoves = this.board.getMoves(side);
+                
+                if (newMoves.isEmpty()) {
+                    board.undoMove();
+                    return -10000 - currentDepth;
+                }
+                
+                int eval = minimax(currentDepth-1, alpha, beta, true, newMoves);
+                
                 board.undoMove();
 
                 minEval = Math.min(minEval, eval);

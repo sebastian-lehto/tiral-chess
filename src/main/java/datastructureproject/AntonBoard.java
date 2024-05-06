@@ -1,6 +1,7 @@
 package datastructureproject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import chess.engine.GameState;
 
@@ -53,7 +54,7 @@ public class AntonBoard {
             }
         }
 
-        if (piece == 'N') {
+        else if (piece == 'N') {
             int[][] dirs = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2},};
             for (int[] dir : dirs) {
                 int newCol = col + (dir[0]);
@@ -63,9 +64,10 @@ public class AntonBoard {
                     moves.add(square+getRank(newCol)+(8-newRow));
                 }
             }
+            return moves;
         }
 
-        if (piece == 'B') {
+        else if (piece == 'B') {
             int[][] dirs = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
             for (int[] dir : dirs) {
                 for (int i = 1; i < 8; i++) {
@@ -81,7 +83,7 @@ public class AntonBoard {
             }
         }
 
-        if (piece == 'R') {
+        else if (piece == 'R') {
             int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
             for (int[] dir : dirs) {
                 for (int i = 1; i < 8; i++) {
@@ -97,7 +99,7 @@ public class AntonBoard {
             }
         }
 
-        if (piece == 'Q') {
+        else if (piece == 'Q') {
             int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
             for (int[] dir : dirs) {
                 for (int i = 1; i < 8; i++) {
@@ -113,7 +115,7 @@ public class AntonBoard {
             }
         }
 
-        if (piece == 'K') {
+        else if (piece == 'K') {
             int[][] dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
 
             for (int[] dir : dirs) {
@@ -188,25 +190,41 @@ public class AntonBoard {
                  if (color == '-') continue;
                  Character piece = this.board[i][j].charAt(1);
                  int value = 0;
+                 //boolean opTurn = this.moveLog.get(this.moveLog.size()-1).mover == "" + color;
 
                  switch (piece) {
                     case 'P':
                         value = 10;
                         break;
                     case 'B':
-                        value = 30 - evaluateSquare(color, i, j);
+                        value = 30;
+                        //int threat = evaluateSquare(color, i, j);
+                        //if (opTurn && threat != 0) value = 10; 
+                        if (i >= 2 && i <= 5) value++;
+                        if (j >= 2 && j <= 5) value++;
                         break;
                     case 'N':
-                        value = 30 - evaluateSquare(color, i, j);
+                        value = 30;
+                        //threat = evaluateSquare(color, i, j);
+                        //if (opTurn && threat != 0) value = 10;
+                        if (i >= 2 && i <= 5) value++;
+                        if (j >= 2 && j <= 5) value++;
                         break;
                     case 'R':
-                        value = 50 - evaluateSquare(color, i, j);
+                        value = 50;
+                        //threat = evaluateSquare(color, i, j);
+                        //if (opTurn && threat != 0) value = 10;
+                        if (i >= 2 && i <= 5) value++;
+                        if (j >= 2 && j <= 5) value++;
                         break;
                     case 'Q':
-                        value = 90 - evaluateSquare(color, i, j);
+                        value = 90;
+                        //threat = evaluateSquare(color, i, j);
+                        //if (opTurn && threat != 0) value = 0;
                         break;
                     case 'K':
-                        value = 10000;
+                        value = 1000;
+                        if (evaluateSquare(color, i, j) != 0) value = 250;
                         break;
                     default:
                         value = 0;
@@ -229,6 +247,8 @@ public class AntonBoard {
             }
         }
         moves.removeIf(x -> !validate(x, side));
+        moves.sort((m1, m2) -> Character.compare(m1.charAt(3), m2.charAt(3)));
+        if (side == 'w') Collections.reverse(moves);
         return moves;
     }
     private Character targetColor(int row, int col) {

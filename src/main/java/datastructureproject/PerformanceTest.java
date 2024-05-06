@@ -12,14 +12,6 @@ import java.util.Scanner;
  */
 public class PerformanceTest {
 
-    private ChessBot bot = new AntonBot();
-    private List<GameState> gsList = new ArrayList();
-
-    public void setGsList(List<GameState> gsList) {
-        this.gsList = gsList;
-        
-    }
-
 
     public static void main(String[] args) {
         AntonBot bot = new AntonBot();
