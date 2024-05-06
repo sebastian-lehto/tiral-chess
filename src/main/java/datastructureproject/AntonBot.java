@@ -38,17 +38,15 @@ public class AntonBot implements ChessBot {
             this.board.makeMove(gs.getLatestMove());
         }
 
-        this.move = "a1a1";
         ArrayList<String> moves = this.board.getMoves(side);
         int eval = minimax(this.depth, -100000, 100000, true, moves);
         this.board.makeMove(this.move);
-
         if (eval == 10005 || eval == -10005) this.gameOver = true;
         return this.move;
     }
 
     public int minimax(int currentDepth, int alpha, int beta, boolean maxing, ArrayList<String> moves) {
-
+        
         if (currentDepth == 0) {
             if (side == 'b') return this.board.evaluation() * -1;
             return this.board.evaluation();
@@ -88,7 +86,7 @@ public class AntonBot implements ChessBot {
 
         } else {
             int minEval = 100000;
-            for (String move : this.board.getMoves(this.opponent)) {
+            for (String move : moves) {
                 board.makeMove(move);
                 ArrayList<String> newMoves = this.board.getMoves(side);
                 
