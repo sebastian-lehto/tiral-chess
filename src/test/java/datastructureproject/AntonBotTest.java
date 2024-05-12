@@ -61,29 +61,6 @@ public class AntonBotTest {
         assertEquals(values, "wb5");
     }
 
-    /* @Test
-    public void botFindsBestMove() {
-        GameState gs = new GameState();
-        AntonBot bot = new AntonBot();
-        String[][] testBoard = {
-            {"bR","bN","bB","bQ","bK","bB","bN","bR"},
-            {"bP","bP","bP","bP","bP","bP","bP","bP"},
-            {"--","--","--","--","--","--","--","--"},
-            {"--","--","--","--","--","--","--","--"},
-            {"--","--","--","--","--","--","--","--"},
-            {"--","--","--","--","--","--","--","--"},
-            {"wP","wP","wP","wP","wP","wP","wP","wP"},
-            {"wR","wN","wB","wQ","wK","wB","wN","wR"}
-        };
-        gs.moves.add("a2a4");
-        bot.nextMove(gs);
-        gs.moves.add("a4a5");
-        bot.nextMove(gs);
-        gs.moves.add("a5a6");
-        bot.nextMove(gs);
-        assertEquals(bot.move, "b7a6");
-    } */
-
     @Test
     public void botFindsMateInThree1() {
         GameState gs = new GameState();
