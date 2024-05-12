@@ -10,6 +10,10 @@ public class Move {
         public String mover;
         public String target;
 
+    /* The class Move represents a move made in chess.
+     * A move has a starting and ending square, a mover and a target
+     * This class makes it easier to do and undo moves.
+     */
     public Move(String move, String[][] board) {
         start = move.substring(0, 2);
         end = move.substring(2, 4);

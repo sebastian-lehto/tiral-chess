@@ -24,6 +24,16 @@ public class AntonBoard {
     ArrayList<Move> moveLog = new ArrayList<Move>();
     
 
+
+    /* The method getMovesForSquare() takes a squares coordinates and returns a list of all the 
+       moves for the piece in that square.
+
+    * @param        row the row of the square
+    * @param        col the column of the square
+    * @param        side the side of the moving player
+    * 
+    * @return       a list of the moves for the piece in specified square
+    */
     public ArrayList<String> getMovesForSquare(int row, int col, Character side) {
         Character color = 'b';
         Character opponent = 'w';
@@ -130,6 +140,10 @@ public class AntonBoard {
         return moves;
     }
 
+    /* The method makeMove() takes a moves notation and changes the board accordingly
+     * 
+     * @param notation      the notation of the move to be made
+    */
     public void makeMove(String notation) {
         Move move = new Move(notation, this.board);
         
@@ -151,6 +165,8 @@ public class AntonBoard {
         }
         this.moveLog.add(move);
     }
+
+    /* The method undoMove() takes the last move from the moveLog and reverses it */
     public void undoMove() {
         if (moveLog.isEmpty()) return;
 
@@ -168,6 +184,16 @@ public class AntonBoard {
         }
         this.moveLog.remove(this.moveLog.size() - 1);
     }
+
+    /* The method validate() takes a move and a side and checks if the move is legal 
+     * by testing if the moving player is in check after the move is made. 
+     * The move is undone after the validation
+     * 
+     * @param move      the notation of the move
+     * @param side      the moving players side
+     * 
+     * @return          True if the move is illegal, else False
+     */
     private boolean validate(String move, Character side) {  
         
         makeMove(move);
@@ -182,11 +208,17 @@ public class AntonBoard {
         return valid;
     }
 
+    /* The method evaluation() goes through each square and applies the heurestics function 
+     * to get a static evaluation of the state of the game. 
+     * 
+     * @return      static evaluation of the state of the game as an integer.
+     */
     public int evaluation() {
         int eval = 0;
         for (int i = 0; i < 8; i ++) {
             for (int j = 0; j < 8; j++) {
                  Character color = this.board[i][j].charAt(0);
+                 int baseRank = (color == 'w') ? 7 : 0;
                  if (color == '-') continue;
                  Character piece = this.board[i][j].charAt(1);
                  int value = 0;
@@ -198,31 +230,33 @@ public class AntonBoard {
                         break;
                     case 'B':
                         value = 30;
+                        if (i >= 2 && i <= 5) value += 2;
+                        if (j >= 2 && j <= 5) value += 2;
+                        if (i == baseRank) value = 15;
                         int threat = evaluateSquare(color, i, j);
                         if (opTurn && threat != 0) value = 10;
-                        if (i >= 2 && i <= 5) value++;
-                        if (j >= 2 && j <= 5) value++;
                         break;
                     case 'N':
                         value = 30;
+                        if (i >= 2 && i <= 5) value += 2;
+                        if (j >= 2 && j <= 5) value += 2;
+                        if (i == baseRank) value = 15;
                         threat = evaluateSquare(color, i, j);
                         if (opTurn && threat != 0) value = 10;
-                        if (i >= 2 && i <= 5) value++;
-                        if (j >= 2 && j <= 5) value++;
                         break;
                     case 'R':
                         value = 50;
+                        if (i >= 2 && i <= 5) value += 1;
+                        if (j >= 2 && j <= 5) value += 1;
                         threat = evaluateSquare(color, i, j);
-                        if (opTurn && threat != 0) value = 10;
-                        if (i >= 2 && i <= 5) value++;
-                        if (j >= 2 && j <= 5) value++;
+                        if (opTurn && threat != 0) value = 0;
                         break;
                     case 'Q':
                         value = 90;
                         break;
                     case 'K':
                         value = 1000;
-                        if (evaluateSquare(color, i, j) != 0) value = 850;
+                        //if (evaluateSquare(color, i, j) != 0) value = 950;
                         break;
                     default:
                         value = 0;
@@ -236,6 +270,12 @@ public class AntonBoard {
         return eval;
     }
 
+    /* The method getMoves() goes through each square and finds all moves 
+     * for the moving players pieces. The moves are then validated to 
+     * filter out illegal moves.
+     * 
+     * @param side      the side of the moving player
+     */
     public ArrayList<String> getMoves(Character side) {
         ArrayList<String> moves = new ArrayList<String>();
 
@@ -249,13 +289,38 @@ public class AntonBoard {
         if (side == 'w') Collections.reverse(moves);
         return moves;
     }
+
+    /* The method targetColor takes a square and return the color of the piece on that square
+     * 
+     * @param row       the row of the square
+     * @param col       the column of the square
+     * 
+     * @return          o if square is not on the board, - if square is empty, else color of the piece
+     */
     private Character targetColor(int row, int col) {
         if (!onBoard(col, row)) return 'o';
         return this.board[row][col].charAt(0);
     }
+
+    /* The method onBoard checks if the given coordinates are inside the boards limits
+     * 
+     * @param row       the row of the square
+     * @param col       the column of the square
+     * 
+     * @return          True if coordinates on board, else False
+     */
     private boolean onBoard(int col, int row) {
         return (col > -1 && col < 8 && row > -1 && row < 8);
     }
+
+    /* The method evaluateSquare checks if a given square is under attack 
+     * 
+     * @param side      side of the piece potentially under attack
+     * @param row       the row of the square
+     * @param col       the column of the square
+     * 
+     * @return          the number of pieces attacking the square
+    */
     private int evaluateSquare(Character side, int row, int col) {
         int checks = 0;
         Character opponent = (side == 'b') ? 'w' : 'b';
@@ -306,6 +371,8 @@ public class AntonBoard {
         }
         return checks;
     }
+
+    /* The method printBoard prints out the board in its current state */
     public void printBoard() {
         for (String[] line : this.board) {
             for (String sq : line) {
@@ -315,6 +382,21 @@ public class AntonBoard {
         }
         System.out.println("________________________");
     }
+
+    /* The method setBoard sets the game to a specified position 
+     * 
+     * @param       the state that the game is to be set in
+    */
+    public void setBoard(String[][] board) {
+        this.board = board;
+    }
+
+    /* The method getRank returns the chess rank corresponding to the given column number
+     * 
+     * @param col       column number of the rank
+     * 
+     * @return          the chess rank of the column
+    */
     private String getRank(int col) {
         switch (col) {
             case 0:

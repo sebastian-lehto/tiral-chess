@@ -24,10 +24,19 @@ public class AntonBot implements ChessBot {
 
     }
 
+    /* The method print prints out the board */
     public void print() {
         this.board.printBoard();
     }
 
+    /* The method nextMove either parses the latest move or sets the bot to play the first move as white.
+     * Then it uses the minimax function to find the best move.
+     * Then it checks if the game is over
+     * 
+     * @param gs        the GameState object that contains all moves
+     * 
+     * @return          the best move
+     */
     @Override
     public String nextMove(GameState gs) {
 
@@ -45,8 +54,8 @@ public class AntonBot implements ChessBot {
         return this.move;
     }
 
+    /* The minimax function */
     public int minimax(int currentDepth, int alpha, int beta, boolean maxing, ArrayList<String> moves) {
-        
         if (currentDepth == 0) {
             if (side == 'b') return this.board.evaluation() * -1;
             return this.board.evaluation();
@@ -54,10 +63,9 @@ public class AntonBot implements ChessBot {
         
         if (maxing) {
             int maxEval = -100000;
-            
             for (String move : moves) {
                 
-                board.makeMove(move);
+                this.board.makeMove(move);
                 ArrayList<String> newMoves = this.board.getMoves(opponent);
 
                 if (newMoves.isEmpty()) {
@@ -65,6 +73,7 @@ public class AntonBot implements ChessBot {
                         this.move = move;
                     }
                     board.undoMove();
+                    maxEval = 10000 + currentDepth;
                     return 10000 + currentDepth;
                 }
                 
@@ -76,7 +85,8 @@ public class AntonBot implements ChessBot {
                     if (currentDepth == this.depth) {
                         this.move = move;
                     }
-                    maxEval = eval; 
+                    maxEval = eval;
+                    
                 } 
                 alpha = Math.max(alpha, eval);
                 if (beta <= alpha) break;
@@ -87,11 +97,12 @@ public class AntonBot implements ChessBot {
         } else {
             int minEval = 100000;
             for (String move : moves) {
-                board.makeMove(move);
+                this.board.makeMove(move);
                 ArrayList<String> newMoves = this.board.getMoves(side);
                 
                 if (newMoves.isEmpty()) {
                     board.undoMove();
+                    minEval = -10000 - currentDepth;
                     return -10000 - currentDepth;
                 }
                 
