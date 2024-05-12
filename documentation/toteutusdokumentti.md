@@ -20,3 +20,6 @@ Se ei myöskään tunnista häviämistä siirtojen toistolla, 50 siirron säänn
 
 ## LLM-mallien käyttö
 En käyttänyt projektissa LLM-malleja. 
+
+## Viitteet
+-[Projektin pohja](https://github.com/TiraLabra/chess)
